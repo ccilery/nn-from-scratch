@@ -162,6 +162,8 @@ class Network(object):
         return loss, dws, dbs
 
     def train(self, training_data, validation_data, learning_rate, epochs, batch_size):
+        val_accs = []
+
         for epoch in range(epochs):           
             ####################### 训练集进行训练 #############################
             x_batches, y_batches = load_batches(training_data, batch_size)
@@ -172,20 +174,23 @@ class Network(object):
                 self.weights = [weight - learning_rate * dw for weight, dw in zip(self.weights, dws)]
                 self.bias = [bias - learning_rate * db for bias, db in zip(self.bias, dbs)]
 
-                if i % 100 == 0:
-                    print("Epoch {}, batch {}, loss {}".format(epoch, i, loss))
+                # if i % 100 == 0:
+                #     print("Epoch {}, batch {}, loss {}".format(epoch, i, loss))
 
             ######################## 验证集进行evaluate ##########################
             x_batches, y_batches = load_batches(validation_data, batch_size)
 
             corrects = 0
+            n = len(validation_data[0])
             for i, (x, y) in enumerate(zip(x_batches, y_batches)):
                 logits = self.forward(x)
                 correct = np.sum(np.argmax(logits, axis=-1) == y)
                 corrects += correct
-            
-            print("Epoch {}, acc {}/{}={}".format(epoch, corrects, len(validation_data[0]), corrects/len(validation_data[0])))
-
+            acc = corrects / n
+            val_accs.append(acc)
+            print("Epoch {}, acc {}/{}={}".format(epoch, corrects, n, acc))
+        print("验证集上的所有epoch的准确率: ", val_accs)
+        print("最好准确率: ", np.max(val_accs))
 
 def main():
     path = "data/mnist.pkl.gz"
