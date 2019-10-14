@@ -1,0 +1,1 @@
+利用numpy实现神经网络: fully-connected nn, cnn, rnn, lstm， 并将网络应用到各自适合的一个典型的任务上。
